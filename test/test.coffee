@@ -63,4 +63,4 @@ suite "ripple-data", ->
 
       make_test "shBYCZnEekyeEG2WrZXW6hA6nQ7Hx"
       make_test s for s in seeds
-      # make_test s for s in ("passphrase#{i}" for i in [20..100])
+      # make_test s for s in ("passphrase#{i}" for i in [20..1000])

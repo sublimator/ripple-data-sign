@@ -178,8 +178,10 @@ exports.PublicKey = class PublicKey
     y = x.mul(x.square().add(a)).add(b).power(Curve.root_exp)
     # We need below
     y.fullReduce()
-    isOdd = Number(y.mod(2).equals(1))
-    y = new curve.field q.sub(y).normalize() if isOdd != wasOdd
+    # isOdd = Number(y.mod(2).equals(1))
+    # perf hack
+    isOdd = y.limbs[0] & 0x01
+    y = new curve.field q.sub(y) if isOdd != wasOdd
     p = new sjcl.ecc.point(curve, x, y)
 
   account_signed: (account, data, sig) ->
