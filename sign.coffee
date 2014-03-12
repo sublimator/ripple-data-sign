@@ -20,12 +20,12 @@ hasher = (str) ->
 exports.sign = (secret, data) ->
   '''
  
-  This code is self contained, just needs some requires:
- 
- 
   @secret
-    seed 
- 
+    base58 encoded seed string 
+    eg. shVhsMDVmBBkeg1U1rFrFDuoCE2Gv
+    (in fact a passphrase will also work, 
+     as will anything that Seed.from_json can understand )
+
   @data
     str (will be utf8 encoded before hashing)
  
@@ -36,7 +36,7 @@ exports.sign = (secret, data) ->
   hash = UInt256.from_bits hasher(data)
   der_bits = key_pair.sign(hash)
  
-  # return object, use PublicKey.verify static method
+  # return object, use pub_key.verify 
   signed_data_bundle =
     address: address.to_json()
     pub_key: key_pair.to_hex_pub()
