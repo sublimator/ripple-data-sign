@@ -157,20 +157,21 @@ exports.PublicKey = class PublicKey
       the public key point on the secp256k curve in compressed form
 
     '''
-    throw new Error("invalid pubkey") unless pub_key_hex.length <= 66
     @address = address_from_pubkey pub_key_hex
     @pub_point = PublicKey.decompress(pub_key_hex)
     @pub_key = new sjcl.ecc.ecdsa.publicKey(SECP_256, @pub_point)
     @hash_func = half_sha_512
 
   @decompress = (hex) ->
+    throw new Error("invalid pubkey") unless hex.length <= 66
+
     curve = SECP_256
     # this only works with ripple's monkey patched sjcl
     pub_bits = hex_2_bits hex
     w = sjcl.bitArray
     header = w.bitSlice(pub_bits, 0, 8)
     y_tilde = bits_2_bytes(header)[0] & 0x01
-    x = curve.field.fromBits(w.bitSlice(pub_bits, 9))
+    x = curve.field.fromBits(w.bitSlice(pub_bits, 8))
 
     q = Curve.modulus # prime modulus
     a = curve.a
@@ -179,7 +180,9 @@ exports.PublicKey = class PublicKey
     y = x.mul(x.square().add(a)).add(b).power(Curve.root_exp)
     bit0 = y.limbs[0] & 1
 
-    y = q.sub(y).normalize() if bit0 != y_tilde
+    if bit0 != y_tilde
+      y = new curve.field q.sub(y)
+
     p = new sjcl.ecc.point(curve, x, y)
 
   account_signed: (account, data, sig) ->
@@ -234,15 +237,16 @@ exports.PublicKey = class PublicKey
     try
       der = new Signature(sig, false)
     catch e
-      console.info e
-      return {verified: false, reason: "invalid_signature"}
+      console.info "error while decoding sig", e.toString()
+      return {verified: false, reason: "invalid_signature", e: String(e)}
 
     try
       @pub_key.verify(@hash_func(data), der.rs_bits())
       return {verified: true}
     catch e
-      console.info e
-      return {verified: false, reason: "pubkey_sig_mismatch"}
+      console.info "error while verifying", e.toString()
+      # TODO
+      return {verified: false, reason: "pubkey_sig_mismatch", e: String(e)}
 
 #################################### VERIFY ####################################
 

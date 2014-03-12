@@ -6,7 +6,7 @@
   "scripts": {
     "test": "mocha"
   },
-  "author": "",
+  "author": "ndudfield@gmail.com",
   "license": "ISC",
   "dependencies" : {
     "ripple-lib" : "git://github.com/emschwartz/ripple-lib.git#develop"
@@ -16,4 +16,3 @@
     "mocha": "~1.13.0"
   }
 }
-
