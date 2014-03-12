@@ -73,7 +73,7 @@ address_from_pubkey = (hex) ->
 
 ################################### SIGNATURE ##################################
 
-class Signature
+exports.Signature = class Signature
   '''
 
   Represents an ECC ecdsa signature 
@@ -149,7 +149,7 @@ class Signature
 
 ################################## PUBLIC KEY ##################################
 
-class PublicKey
+exports.PublicKey = class PublicKey
   constructor: (pub_key_hex) ->
     '''
     @pub_key_hex
