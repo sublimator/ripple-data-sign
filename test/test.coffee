@@ -3,7 +3,7 @@
 # Used by client
 {sign} = require '../sign'
 # Used on server
-{verify, PublicKey} = require '../pub_key'
+{verify, PublicKey, Curve} = require '../pub_key'
 {Seed} = require 'ripple-lib'
 
 assert = require 'assert'
@@ -37,18 +37,30 @@ suite "ripple-data", ->
     make_test s for s in seeds
 
   suite "PublicKey", ->
-    suite.only "decompressing points", ->
+    suite "decompressing points", ->
       make_test = (seed) ->
         seed = Seed.from_json(seed)
         seed_json = seed.to_json()
 
         test "decompressing pub_key for #{seed_json}", ->
           key_pair = seed.get_key()
-          console.log key_pair.get_address().to_json()
           point = key_pair._pub()._point
-          decompressed = PublicKey.decompress(key_pair.to_hex_pub())
-          assert decompressed.x.equals(point.x), "x is wrong"
-          assert decompressed.y.equals(point.y), "y is wrong"
+          pub_key_hex = key_pair.to_hex_pub()
+          decompressed = PublicKey.decompress(pub_key_hex)
+
+          assert_points_equal = (ord) ->
+            actual = decompressed[ord]
+            expected = point[ord]
+            is_equal = actual.equals(expected)
+
+            if not is_equal and ord == 'y' and Curve.modulus.sub(actual).equals expected
+              console.log 'needs inverting'
+
+            assert is_equal, "#{ord} is wrong, expected: #{expected}, got: #{actual}"
+
+          assert_points_equal 'x'
+          assert_points_equal 'y'
 
       make_test "shBYCZnEekyeEG2WrZXW6hA6nQ7Hx"
       make_test s for s in seeds
+      # make_test s for s in ("passphrase#{i}" for i in [20..100])

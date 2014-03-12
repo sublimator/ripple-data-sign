@@ -35,7 +35,7 @@ This requires a version of ripple-lib >= a specific commit:
 
 SECP_256 = sjcl.ecc.curves.c256
 
-Curve = do -> 
+exports.Curve = Curve = do -> 
   order = SECP_256.r
   modulus = SECP_256.field.prototype.modulus
 
@@ -164,25 +164,22 @@ exports.PublicKey = class PublicKey
 
   @decompress = (hex) ->
     throw new Error("invalid pubkey") unless hex.length <= 66
+    w        = sjcl.bitArray
 
-    curve = SECP_256
-    # this only works with ripple's monkey patched sjcl
+    curve    = SECP_256
     pub_bits = hex_2_bits hex
-    w = sjcl.bitArray
-    header = w.bitSlice(pub_bits, 0, 8)
-    y_tilde = bits_2_bytes(header)[0] & 0x01
-    x = curve.field.fromBits(w.bitSlice(pub_bits, 8))
+    wasOdd   = w.extract(pub_bits, 0, 8) & 0x01
+    x        = curve.field.fromBits(w.bitSlice(pub_bits, 8))
 
     q = Curve.modulus # prime modulus
     a = curve.a
     b = curve.b
 
     y = x.mul(x.square().add(a)).add(b).power(Curve.root_exp)
-    bit0 = y.limbs[0] & 1
-
-    if bit0 != y_tilde
-      y = new curve.field q.sub(y)
-
+    # We need below
+    y.fullReduce()
+    isOdd = Number(y.mod(2).equals(1))
+    y = new curve.field q.sub(y).normalize() if isOdd != wasOdd
     p = new sjcl.ecc.point(curve, x, y)
 
   account_signed: (account, data, sig) ->
