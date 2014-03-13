@@ -17,4 +17,4 @@ account_info =  {Account: bundle.address}
 verified     =  verify(account_info, bundle)
 
 if verified.verified
-	console.log 'verified', verified.verified
+	console.log "Data verified to be signed with public key matching #{verified.verified} hash/address"

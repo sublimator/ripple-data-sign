@@ -189,8 +189,31 @@ exports.PublicKey = class PublicKey
     y = new curve.field q.sub(y) if isOdd != wasOdd
     p = new sjcl.ecc.point(curve, x, y)
 
-  account_signed: (account, data, sig) ->
+  account_signed: (account_info, data, sig) ->
     '''
+
+    @account_info
+      An `AccountRoot` as returned by `account_info` rpc command
+      Contains 
+
+      Fields:
+        Account
+          str
+          A ripple address, ie a base58 encode hash of a public key
+
+        RegularKey
+          str
+          A ripple address, ie a base58 encode hash of a public key
+
+    @data
+      string
+      the data signed with the private key matching the address
+      uses @hash_func, typically half_sha_512 of utf8 encoded str
+
+    @sig
+      hex encoded string
+      the der encoded signature
+      must be in canonical form
 
     @return
       {
@@ -202,8 +225,8 @@ exports.PublicKey = class PublicKey
     check = {verified: false, reason: "Account or RegularKey not set"}
 
     for address in ['Account', 'RegularKey']
-      if account[address]?
-        check = @address_signed(account[address], data, sig)
+      if account_info[address]?
+        check = @address_signed(account_info[address], data, sig)
         if check.verified
           check.verified = address
           break
