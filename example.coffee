@@ -1,12 +1,20 @@
-# Used by client
+
 {sign} = require './sign'
-# Used on server
+
 {verify} = require './pub_key'
 
 seed = 'shBYCZnEekyeEG2WrZXW6hA6nQ7Hx'
 data = 'what in the !@#$ bar! © ® ™ • ½ ¼ ¾ ⅓ ⅔ † ‡ µ ¢ £ € オ サ デ'
 
+# Done in browser
 bundle   = sign(seed, data)
-verified = verify(bundle)
 
-# console.log 'verified', verified
+# Done on server
+# normally you'd get this an `account_info` request
+account_info =  {Account: bundle.address}
+# Will check Account and RegularKey fields to see if they match
+# public key in the bundle
+verified     =  verify(account_info, bundle)
+
+if verified.verified
+	console.log 'verified', verified.verified

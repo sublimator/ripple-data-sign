@@ -23,15 +23,15 @@ seeds = [ 'ssmzDSQmFVf2ibXgWRcBixD9vxSPd',
 
 suite "ripple-data", ->
   suite "verify/sign", ->
-    make_test = (passphrase) ->
-      seed = Seed.from_json(passphrase).to_json()
-
+    make_test = (seed) ->
       test "hi level helpers work with #{seed}", ->
         data = 'what in the !@#$ bar! © ® ™ • ½ ¼ ¾ ⅓ ⅔ † ‡ µ ¢ £ € オ サ デ'
 
         bundle   = sign(seed, data)
-        verified = verify(bundle)
-        assert verified
+        # typically the address wouldn't be taken from here
+        account_info = {Account: bundle.address}
+        verified = verify(account_info, bundle)
+        assert verified.verified
 
     make_test "shBYCZnEekyeEG2WrZXW6hA6nQ7Hx"
     make_test s for s in seeds

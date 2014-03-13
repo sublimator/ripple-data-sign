@@ -61,12 +61,17 @@ pretty_json = (v) ->
 ripemd160_of_sha256 = (bits) ->
   more_bits = sjcl.hash.ripemd160.hash sjcl.hash.sha256.hash(bits)
 
-half_sha_512 = (hex) ->
-  bits = utf8_to_bits hex
-  hash = sjcl.bitArray.bitSlice(sjcl.hash.sha512.hash(bits), 0, 256)
+half_sha_512 = (str) ->
+  '''
+  @str
+    A String, will be utf8 encoded into bytes, then hashed
 
-sha256 = (hex) ->
-  sjcl.hash.sha256.hash(hex_2_bits(hex))
+  @return
+    The first 256 bits of a sha512
+
+  '''
+  bits = utf8_to_bits str
+  hash = sjcl.bitArray.bitSlice(sjcl.hash.sha512.hash(bits), 0, 256)
 
 address_from_pubkey = (hex) ->
   UInt160.from_bits(ripemd160_of_sha256(hex_2_bits(hex)))
@@ -249,7 +254,7 @@ exports.PublicKey = class PublicKey
 
 #################################### VERIFY ####################################
 
-exports.verify = (bundle) ->
+exports.verify = (account_info, bundle) ->
   '''
 
   Simple boolean returning function, complementary to `sign` which takes
@@ -258,4 +263,4 @@ exports.verify = (bundle) ->
   '''
   {address, pub_key, data, sig} = bundle
   pk = new PublicKey(pub_key)
-  return pk.address_signed(address, data, sig).verified
+  return pk.account_signed(account_info, data, sig)
