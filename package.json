@@ -9,7 +9,7 @@
   "author": "ndudfield@gmail.com",
   "license": "ISC",
   "dependencies" : {
-    "ripple-lib" : "git://github.com/emschwartz/ripple-lib.git#develop"
+    "ripple-lib" : "git://github.com/ripple/ripple-lib.git#develop"
   },
   "devDependencies": {
     "coffee-script": "~1.6.3",
