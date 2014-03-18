@@ -12,7 +12,7 @@
     "ripple-lib" : "git://github.com/ripple/ripple-lib.git#develop"
   },
   "devDependencies": {
-    "coffee-script": "^1.6.3",
-    "mocha": "^1.18.0"
+    "coffee-script": "1.6.3",
+    "mocha": "1.18.0"
   }
 }
