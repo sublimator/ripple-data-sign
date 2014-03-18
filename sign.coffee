@@ -11,7 +11,7 @@ Utf8Codec = sjcl.codec.utf8String
 
 #################################### HELPERS ###################################
 
-hasher = (str) ->
+half_sha_512 = (str) ->
   bits = Utf8Codec.toBits str
   hash = sjcl.bitArray.bitSlice(sjcl.hash.sha512.hash(bits), 0, 256)
 
@@ -33,7 +33,7 @@ exports.sign = (secret, data) ->
   seed = Seed.from_json secret
   key_pair = seed.get_key()
   address = key_pair.get_address()
-  hash = UInt256.from_bits hasher(data)
+  hash = UInt256.from_bits half_sha_512(data)
   der_bits = key_pair.sign(hash)
  
   # return object, use pub_key.verify 

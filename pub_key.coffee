@@ -173,7 +173,7 @@ exports.PublicKey = class PublicKey
 
     curve    = SECP_256
     pub_bits = hex_2_bits hex
-    wasOdd   = w.extract(pub_bits, 0, 8) & 0x01
+    was_odd  = w.extract(pub_bits, 0, 8) & 0x01
     x        = curve.field.fromBits(w.bitSlice(pub_bits, 8))
 
     q = Curve.modulus # prime modulus
@@ -185,8 +185,8 @@ exports.PublicKey = class PublicKey
     y.fullReduce()
     # isOdd = Number(y.mod(2).equals(1))
     # perf hack
-    isOdd = y.limbs[0] & 0x01
-    y = new curve.field q.sub(y) if isOdd != wasOdd
+    is_odd = y.limbs[0] & 0x01
+    y = new curve.field q.sub(y) if is_odd != was_odd
     p = new sjcl.ecc.point(curve, x, y)
 
   account_signed: (account_info, data, sig) ->
